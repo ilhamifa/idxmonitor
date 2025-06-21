@@ -13,12 +13,13 @@ app.get("/get", async (req, res) => {
   const symbol = req.query.symbol;
   if (!symbol) return res.status(400).send("Symbol is required");
 
-  const url = `https://query1.finance.yahoo.com/v7/finance/quote?symbols=${symbol}.JK`;
+  const url = `https://apidojo-yahoo-finance-v1.p.rapidapi.com/stock/v2/get-summary?symbol=${symbol}.JK&region=ID`;
 
   try {
     const response = await axios.get(url, {
       headers: {
-        "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64)"
+        "X-RapidAPI-Key": "102fbc59camsh0bd008b773ba4e0p1e697fjsnc38e32a38aab", // <-- Your RapidAPI key
+        "X-RapidAPI-Host": "apidojo-yahoo-finance-v1.p.rapidapi.com"
       },
       timeout: 8000
     });
@@ -28,7 +29,7 @@ app.get("/get", async (req, res) => {
     console.error("Fetch error:", err.message);
     res
       .status(err.response?.status || 500)
-      .send("Error: " + (err.response?.data?.finance?.error?.description || err.message));
+      .send("Error: " + (err.response?.data?.message || err.message));
   }
 });
 

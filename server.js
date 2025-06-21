@@ -16,20 +16,35 @@ app.get("/get", async (req, res) => {
   const url = `https://apidojo-yahoo-finance-v1.p.rapidapi.com/stock/v2/get-summary?symbol=${symbol}.JK&region=ID`;
 
   try {
+    console.log("🔍 Fetching:", url);
+
     const response = await axios.get(url, {
       headers: {
-        "X-RapidAPI-Key": "102fbc59camsh0bd008b773ba4e0p1e697fjsnc38e32a38aab", // <-- Your RapidAPI key
+        "X-RapidAPI-Key": "102fbc59camsh0bd008b773ba4e0p1e697fjsnc38e32a38aab",
         "X-RapidAPI-Host": "apidojo-yahoo-finance-v1.p.rapidapi.com"
       },
       timeout: 8000
     });
 
-    res.json(response.data);
+    console.log("✅ Yahoo response OK");
+    res.json(response.data); // Send the full response JSON to browser
+
   } catch (err) {
-    console.error("Fetch error:", err.message);
-    res
-      .status(err.response?.status || 500)
-      .send("Error: " + (err.response?.data?.message || err.message));
+    console.error("❌ Error fetching Yahoo data:");
+    if (err.response) {
+      console.error("Status:", err.response.status);
+      console.error("Body:", err.response.data);
+      res.status(err.response.status).json({
+        error: err.response.data,
+        message: "Yahoo API error"
+      });
+    } else {
+      console.error("Unknown error:", err.message);
+      res.status(500).json({
+        error: err.message,
+        message: "Proxy server error"
+      });
+    }
   }
 });
 

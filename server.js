@@ -13,15 +13,12 @@ app.get("/get", async (req, res) => {
   const symbol = req.query.symbol;
   if (!symbol) return res.status(400).send("Symbol is required");
 
-  let fullSymbol = symbol;
-let region = "ID";
+ let fullSymbol = symbol;
+let region = "US";
 
 if (!symbol.includes(".")) {
-  // If user provides just 'BBCA', add '.JK' and use Indonesia
   fullSymbol = `${symbol}.JK`;
-} else {
-  // Use US region for US stocks
-  region = "US";
+  region = "ID";
 }
 
   const url = `https://apidojo-yahoo-finance-v1.p.rapidapi.com/stock/v2/get-summary?symbol=${fullSymbol}&region=${region}`;

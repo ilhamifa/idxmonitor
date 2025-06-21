@@ -13,21 +13,31 @@ app.get("/get", async (req, res) => {
   const symbol = req.query.symbol;
   if (!symbol) return res.status(400).send("Symbol is required");
 
-  const url = `https://apidojo-yahoo-finance-v1.p.rapidapi.com/stock/v2/get-summary?symbol=${symbol}.JK&region=ID`;
+  const fullSymbol = `${symbol}.JK`;
+  const url = `https://apidojo-yahoo-finance-v1.p.rapidapi.com/stock/v2/get-summary?symbol=${fullSymbol}&region=ID`;
 
   try {
     console.log("🔍 Fetching:", url);
 
     const response = await axios.get(url, {
       headers: {
-        "X-RapidAPI-Key": "102fbc59camsh0bd008b773ba4e0p1e697fjsnc38e32a38aab",
+        "X-RapidAPI-Key": "102fbc59camsh0bd008b773ba4e0p1e697fjsnc38e32a38aab", // Your RapidAPI Key
         "X-RapidAPI-Host": "apidojo-yahoo-finance-v1.p.rapidapi.com"
       },
       timeout: 8000
     });
 
+    const data = response.data;
     console.log("✅ Yahoo response OK");
-    res.json(response.data); // Send the full response JSON to browser
+    console.log("Raw data from Yahoo:", JSON.stringify(data, null, 2));
+
+    // Send clean response
+    res.json({
+      symbol: fullSymbol,
+      price: data?.price?.regularMarketPrice?.raw ?? null,
+      changePercent: data?.price?.regularMarketChangePercent?.raw ?? null,
+      full: data // optional: comment this out if you want smaller response
+    });
 
   } catch (err) {
     console.error("❌ Error fetching Yahoo data:");

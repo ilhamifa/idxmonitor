@@ -13,7 +13,7 @@ app.get("/get", async (req, res) => {
   const symbol = req.query.symbol;
   if (!symbol) return res.status(400).send("Symbol is required");
 
-  const fullSymbol = `${symbol}.JK`;
+  const fullSymbol = symbol.includes(".") ? symbol : `${symbol}.JK`;
   const url = `https://apidojo-yahoo-finance-v1.p.rapidapi.com/stock/v2/get-summary?symbol=${fullSymbol}&region=ID`;
 
   try {

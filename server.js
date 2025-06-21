@@ -27,4 +27,12 @@ app.get("/get", async (req, res) => {
   } catch (err) {
     console.error("Fetch error:", err.message);
     res
-      .status(err.res
+      .status(err.response?.status || 500)
+      .send("Error: " + (err.response?.data?.finance?.error?.description || err.message));
+  }
+});
+
+const PORT = process.env.PORT || 3000;
+app.listen(PORT, () => {
+  console.log(`✅ Proxy server is running on port ${PORT}`);
+});

@@ -17,7 +17,7 @@ app.get("/get", async (req, res) => {
   const url = `https://apidojo-yahoo-finance-v1.p.rapidapi.com/stock/v2/get-summary?symbol=${fullSymbol}&region=ID`;
 
   try {
-    console.log("🔍 Fetching:", url);
+    console.log("🔍 Fetching from Yahoo:", url);
 
     const response = await axios.get(url, {
       headers: {
@@ -28,15 +28,21 @@ app.get("/get", async (req, res) => {
     });
 
     const data = response.data;
-    console.log("✅ Yahoo response OK");
-    console.log("Raw data from Yahoo:", JSON.stringify(data, null, 2));
 
-    // Send clean response
+    // Debug logging
+    console.log("✅ Yahoo response OK");
+    if (!data?.price) {
+      console.warn("⚠️ No 'price' field in response");
+    }
+
+    const price = data?.price?.regularMarketPrice?.raw ?? null;
+    const changePercent = data?.price?.regularMarketChangePercent?.raw ?? null;
+
     res.json({
       symbol: fullSymbol,
-      price: data?.price?.regularMarketPrice?.raw ?? null,
-      changePercent: data?.price?.regularMarketChangePercent?.raw ?? null,
-      full: data // optional: comment this out if you want smaller response
+      price,
+      changePercent,
+      full: data.price ?? {}
     });
 
   } catch (err) {

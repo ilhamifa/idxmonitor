@@ -32,7 +32,7 @@ app.get("/get", async (req, res) => {
   try {
     const response = await axios.get(url, {
       headers: {
-        "X-RapidAPI-Key": "YOUR_API_KEY_HERE",
+        "X-RapidAPI-Key": "102fbc59camsh0bd008b773ba4e0p1e697fjsnc38e32a38aab",
         "X-RapidAPI-Host": "apidojo-yahoo-finance-v1.p.rapidapi.com"
       },
       timeout: 8000

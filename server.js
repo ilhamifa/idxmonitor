@@ -5,28 +5,25 @@ const cors = require("cors");
 const app = express();
 app.use(cors());
 
-app.get("/", (req, res) => {
-  res.send("✅ IDX Yahoo Finance Proxy is running. Use /get?symbol=BBCA");
-});
-
 app.get("/get", async (req, res) => {
   const symbol = req.query.symbol;
   if (!symbol) return res.status(400).send("Symbol is required");
 
- let fullSymbol = symbol;
-let region = "US";
+  console.log("🧾 Raw symbol:", JSON.stringify(symbol), "🆕 Version: Jun 21 10:50pm");
 
-console.log("🧾 Incoming symbol:", symbol, "🆕 Version: Jun 21 10:37pm");
+  const trimmedSymbol = symbol.trim();
+  let fullSymbol = trimmedSymbol;
+  let region = "US";
 
-if (!symbol.includes(".")) {
-  fullSymbol = `${symbol}.JK`;
-  region = "ID";
-} else if (symbol.endsWith(".JK")) {
-  region = "ID";
-}
+  if (!trimmedSymbol.includes(".")) {
+    fullSymbol = `${trimmedSymbol}.JK`;
+    region = "ID";
+  } else if (trimmedSymbol.endsWith(".JK")) {
+    region = "ID";
+  }
 
-console.log("📌 Full symbol:", fullSymbol);
-console.log("🌍 Region:", region);
+  console.log("📌 Full symbol:", fullSymbol);
+  console.log("🌍 Region:", region);
 
   const url = `https://apidojo-yahoo-finance-v1.p.rapidapi.com/stock/v2/get-summary?symbol=${fullSymbol}&region=${region}`;
 

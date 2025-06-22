@@ -17,7 +17,6 @@ app.get("/get", async (req, res) => {
   let fullSymbol = trimmedSymbol;
   let region = "US";
 
-  // If it's an IDX stock (e.g., BBCA, BBRI), we add .JK
   if (/^[A-Z]{4}$/.test(trimmedSymbol)) {
     fullSymbol = `${trimmedSymbol}.JK`;
     region = "ID";
@@ -46,12 +45,20 @@ app.get("/get", async (req, res) => {
 
     const price = result.regularMarketPrice ?? null;
     const changePercent = result.regularMarketChangePercent ?? null;
+    const bid = result.bid ?? null;
+    const ask = result.ask ?? null;
+    const bidSize = result.bidSize ?? null;
+    const askSize = result.askSize ?? null;
 
     res.json({
       symbol: fullSymbol,
       price,
       changePercent,
-      full: result
+      bid,
+      ask,
+      bidSize,
+      askSize,
+      full: result // optional: full raw data for debugging
     });
 
   } catch (err) {

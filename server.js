@@ -5,68 +5,65 @@ const cors = require("cors");
 const app = express();
 app.use(cors());
 
+app.get("/", (req, res) => {
+  res.send("✅ IDX Yahoo Finance Proxy is running. Use /get?symbol=BBCA or /get?symbol=AAPL");
+});
+
 app.get("/get", async (req, res) => {
-  const symbol = req.query.symbol;
-  if (!symbol) return res.status(400).send("Symbol is required");
+  const rawSymbol = req.query.symbol;
+  if (!rawSymbol) return res.status(400).send("Symbol is required");
 
-  console.log("🧾 Raw symbol:", JSON.stringify(symbol), "🆕 Version: Jun 21 10:50pm");
-
-  const trimmedSymbol = symbol.trim();
+  const trimmedSymbol = rawSymbol.trim().toUpperCase();
   let fullSymbol = trimmedSymbol;
   let region = "US";
 
-  if (!trimmedSymbol.includes(".")) {
+  // If it's an IDX stock (e.g., BBCA, BBRI), we add .JK
+  if (/^[A-Z]{4}$/.test(trimmedSymbol)) {
     fullSymbol = `${trimmedSymbol}.JK`;
     region = "ID";
   } else if (trimmedSymbol.endsWith(".JK")) {
     region = "ID";
   }
 
-  console.log("📌 Full symbol:", fullSymbol);
-  console.log("🌍 Region:", region);
+  console.log(`📥 Symbol: ${trimmedSymbol} → ${fullSymbol} | 🌏 Region: ${region}`);
 
-  const url = `https://apidojo-yahoo-finance-v1.p.rapidapi.com/stock/v2/get-summary?symbol=${fullSymbol}&region=${region}`;
+  const url = `https://apidojo-yahoo-finance-v1.p.rapidapi.com/market/v2/get-quotes?symbols=${fullSymbol}&region=${region}`;
 
   try {
-    console.log("🔍 Fetching from Yahoo:", url);
-
     const response = await axios.get(url, {
       headers: {
-        "X-RapidAPI-Key": "102fbc59camsh0bd008b773ba4e0p1e697fjsnc38e32a38aab", // Your RapidAPI Key
+        "X-RapidAPI-Key": "YOUR_API_KEY_HERE",
         "X-RapidAPI-Host": "apidojo-yahoo-finance-v1.p.rapidapi.com"
       },
       timeout: 8000
     });
 
-    const data = response.data;
+    const result = response.data?.quoteResponse?.result?.[0];
 
-    // Debug logging
-    console.log("✅ Yahoo response OK");
-    if (!data?.price) {
-      console.warn("⚠️ No 'price' field in response");
+    if (!result) {
+      return res.status(404).json({ error: "Symbol not found or invalid data" });
     }
 
-    const price = data?.price?.regularMarketPrice?.raw ?? null;
-    const changePercent = data?.price?.regularMarketChangePercent?.raw ?? null;
+    const price = result.regularMarketPrice ?? null;
+    const changePercent = result.regularMarketChangePercent ?? null;
 
     res.json({
       symbol: fullSymbol,
       price,
       changePercent,
-      full: data.price ?? {}
+      full: result
     });
 
   } catch (err) {
-    console.error("❌ Error fetching Yahoo data:");
+    console.error("❌ Error:", err.message);
     if (err.response) {
       console.error("Status:", err.response.status);
-      console.error("Body:", err.response.data);
+      console.error("Data:", err.response.data);
       res.status(err.response.status).json({
         error: err.response.data,
         message: "Yahoo API error"
       });
     } else {
-      console.error("Unknown error:", err.message);
       res.status(500).json({
         error: err.message,
         message: "Proxy server error"
@@ -77,5 +74,5 @@ app.get("/get", async (req, res) => {
 
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
-  console.log(`✅ Proxy server is running on port ${PORT}`);
+  console.log(`✅ Server running at http://localhost:${PORT}`);
 });

@@ -16,7 +16,7 @@ app.get("/get", async (req, res) => {
  let fullSymbol = symbol;
 let region = "US";
 
-console.log("🧾 Incoming symbol:", symbol);
+console.log("🧾 Incoming symbol:", symbol, "🆕 Version: Jun 21 10:37pm");
 
 if (!symbol.includes(".")) {
   fullSymbol = `${symbol}.JK`;

@@ -16,10 +16,17 @@ app.get("/get", async (req, res) => {
  let fullSymbol = symbol;
 let region = "US";
 
+console.log("🧾 Incoming symbol:", symbol);
+
 if (!symbol.includes(".")) {
   fullSymbol = `${symbol}.JK`;
   region = "ID";
+} else if (symbol.endsWith(".JK")) {
+  region = "ID";
 }
+
+console.log("📌 Full symbol:", fullSymbol);
+console.log("🌍 Region:", region);
 
   const url = `https://apidojo-yahoo-finance-v1.p.rapidapi.com/stock/v2/get-summary?symbol=${fullSymbol}&region=${region}`;
 
